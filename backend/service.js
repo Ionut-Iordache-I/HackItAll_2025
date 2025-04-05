@@ -10,7 +10,7 @@ severityMap = {
   "critical": 5
 }
 
-exports.analyze = async (url, mapping) => {
+exports.analyze = async (url, ids) => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
@@ -37,10 +37,10 @@ exports.analyze = async (url, mapping) => {
   let violationDetails = {};
   
   results['violations'].map((violation) => {
-    if (mapping[violation.id]) {
-      selectedScore += severityMap[violation.impact] * mapping[violation.id] * violation.nodes.length;
-      generalScore += severityMap[violation.impact] * mapping[violation.id] * violation.nodes.length;
-      percentPerMappings[violation.id] = severityMap[violation.impact] * mapping[violation.id] * violation.nodes.length;
+    if (ids.includes(violation.id)) {
+      selectedScore += severityMap[violation.impact] * violation.nodes.length;
+      generalScore += severityMap[violation.impact] * violation.nodes.length;
+      percentPerMappings[violation.id] = severityMap[violation.impact] * violation.nodes.length;
       violationDetails[violation.id] = violation;
     } else {
       generalScore += severityMap[violation.impact];
@@ -51,11 +51,7 @@ exports.analyze = async (url, mapping) => {
 
   for (let key of Object.keys(percentPerMappings)) {
     percentPerMappings[key] = (((percentPerMappings[key] / generalScore) * 100) / percent) * 100;
-    console.log(percentPerMappings[key]);
   }
-
-  console.log(percent + "%")
-  console.log(violationDetails)
 
   await browser.close();
 
