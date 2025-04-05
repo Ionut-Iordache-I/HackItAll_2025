@@ -190,7 +190,7 @@ function AccessibilityDashboard() {
                 {Object.entries(report.percentPerMappings).map(([key, value], index) => (
                   <Box key={key} display="flex" flexDirection="column" alignItems="center">
                     <Typography variant="body1" sx={{ mb: 1 }} color="text.primary">
-                      {key.replace(/-/g, ' ')} Score:
+                      {key} Score:
                     </Typography>
                     <Box position="relative" display="inline-flex">
                       <CircularProgress
