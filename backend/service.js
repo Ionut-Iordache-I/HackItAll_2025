@@ -34,12 +34,14 @@ analyze = async (url, mapping) => {
   let selectedScore = 0;
 
   let percentPerMappings = {};
+  let violationDetails = {};
   
   results['violations'].map((violation) => {
     if (mapping[violation.id]) {
       selectedScore += severityMap[violation.impact] * mapping[violation.id] * violation.nodes.length;
       generalScore += severityMap[violation.impact] * mapping[violation.id] * violation.nodes.length;
       percentPerMappings[violation.id] = severityMap[violation.impact] * mapping[violation.id] * violation.nodes.length;
+      violationDetails[violation.id] = violation;
     } else {
       generalScore += severityMap[violation.impact];
     }
@@ -47,16 +49,17 @@ analyze = async (url, mapping) => {
 
   let percent = (selectedScore / generalScore) * 100;
 
-  // for (let key of Object.keys(percentPerMappings)) {
-  //   percentPerMappings[key] = (percentPerMappings[key] * percent) / 100;
-  //   console.log(percentPerMappings[key]);
-  // }
+  for (let key of Object.keys(percentPerMappings)) {
+    percentPerMappings[key] = (percentPerMappings[key] / generalScore) * 100;
+    console.log(percentPerMappings[key]);
+  }
 
   console.log(percent + "%")
+  console.log(violationDetails)
 
   await browser.close();
 
-  return { results, percent };
+  return { results, percent, percentPerMappings, violationDetails };
 };
 
 analyze('https://nodejs.org/en', {
