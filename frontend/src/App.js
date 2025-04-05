@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import {
   Container,
@@ -285,7 +285,7 @@ function AccessibilityDashboard() {
                           </div>
                         })
                       }
-            </Typography>
+                      </Typography>
                       <Typography variant="body2" color="text.secondary">
                         <strong>HTML:</strong> <code>{node.html}</code>
                       </Typography>
@@ -313,7 +313,11 @@ function AccessibilityDashboard() {
                   ))}
                 </Box>
               ))}
-            </Box>
+              </Box>
+    //           <div
+    //   style={{ width: '100%', minHeight: '600px', border: '1px solid #ccc' }}
+    //   dangerouslySetInnerHTML={{ __html: report.page }}
+    // /></>
           )}
         </Container>
       </Box>

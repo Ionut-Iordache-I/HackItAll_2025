@@ -78,7 +78,7 @@ exports.analyze = async (url, disability) => {
       }
     }
   }
-  await page.screenshot({ path:  path.join(screenshotsDir, "whole-page-original.png")});
+  await page.screenshot({ path:  path.join("../frontend/public/images/", "whole-page-original.png")});
 
   // for debug
   // fs.writeFileSync(
@@ -155,5 +155,5 @@ exports.analyze = async (url, disability) => {
 
   await browser.close();
 
-  return { percent, percentPerMappings, violationDetails, images };
+  return { percent, percentPerMappings, violationDetails, images, page };
 };
