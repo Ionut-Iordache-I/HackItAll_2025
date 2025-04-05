@@ -2,6 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 const axeSource = require('axe-core').source;
+const suggestions = require('./suggestions');
 
 const mappings = JSON.parse(fs.readFileSync('./mappings.json', 'utf8'));
 
@@ -14,7 +15,7 @@ severityMap = {
 
 exports.analyze = async (url, disability) => {
   const browser = await puppeteer.launch();
-  const page = await browser.newPage();
+  let page = await browser.newPage();
 
   const disabilityIds = mappings[disability]
 
@@ -66,37 +67,10 @@ exports.analyze = async (url, disability) => {
   //   path.join(__dirname, 'axe-results.json'),
   //   JSON.stringify(results, null, 2)
   // );
+  
+  await suggestions.applyDisability(page, disability)
 
-  // violations.forEach(violation => {
-  //   violation.nodes.forEach(node => {
-  //     node.target.forEach(selector => {
-  //       customCSS += `
-  //         ${selector} {
-  //           outline: 3px solid red !important;
-  //         }
-  //         ${selector}::after {
-  //           content: 'Violation: ${violation.id}';
-  //           position: absolute;
-  //           background: yellow;
-  //           color: black;
-  //           font-size: 10px;
-  //           padding: 2px 4px;
-  //           z-index: 10000;
-  //         }
-  //         ${selector} {
-  //           position: relative;
-  //         }
-  //         ${selector} {
-  //           /* Also add a class marker for easier querying later */
-  //         }
-  //       `;
-  //     });
-  //   });
-  // });
-
-  // await page.addStyleTag({ content: customCSS });
-
-  // await new Promise(resolve => setTimeout(resolve, 2000));
+  await new Promise(resolve => setTimeout(resolve, 2000));
 
   // Photo after CSS apply
   for (const violation of violations) {
