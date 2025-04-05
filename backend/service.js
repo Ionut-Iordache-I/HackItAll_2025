@@ -3,6 +3,13 @@ const fs = require('fs');
 const path = require('path');
 const axeSource = require('axe-core').source;
 
+severityMap = {
+  "minor": 1,
+  "moderate": 2,
+  "serious": 4,
+  "critical": 5
+}
+
 analyze = async (url, mapping) => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
@@ -13,7 +20,7 @@ analyze = async (url, mapping) => {
 
   const results = await page.evaluate(async () => {
     return await axe.run({
-      resultTypes: ['violations', 'incomplete', 'inapplicable']
+      resultTypes: ['violations']
     });
   });
 
@@ -23,13 +30,33 @@ analyze = async (url, mapping) => {
     JSON.stringify(results, null, 2)
   );
 
+  let generalScore = 0;
+  let selectedScore = 0;
+
+  let percentPerMappings = {};
+  
   results['violations'].map((violation) => {
-    console.log(violation.id)
+    if (mapping[violation.id]) {
+      selectedScore += severityMap[violation.impact] * mapping[violation.id] * violation.nodes.length;
+      generalScore += severityMap[violation.impact] * mapping[violation.id] * violation.nodes.length;
+      percentPerMappings[violation.id] = severityMap[violation.impact] * mapping[violation.id] * violation.nodes.length;
+    } else {
+      generalScore += severityMap[violation.impact];
+    }
   })
+
+  let percent = (selectedScore / generalScore) * 100;
+
+  // for (let key of Object.keys(percentPerMappings)) {
+  //   percentPerMappings[key] = (percentPerMappings[key] * percent) / 100;
+  //   console.log(percentPerMappings[key]);
+  // }
+
+  console.log(percent + "%")
 
   await browser.close();
 
-  return results;
+  return { results, percent };
 };
 
 analyze('https://nodejs.org/en', {
