@@ -36,10 +36,16 @@ function AccessibilityDashboard() {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:5000/api/test-accessibility', {
+      const response = await axios.post('http://localhost:8081/dev/website', {
         url,
-        disabilityType,
+        ids: [
+          "meta-viewport-large",
+          "link-in-text-block",
+          "color-contrast"
+        ],
       });
+
+      console.log(response)
 
       setReport(response.data);
     } catch (error) {
