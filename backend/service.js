@@ -3,29 +3,37 @@ const fs = require('fs');
 const path = require('path');
 const axeSource = require('axe-core').source;
 
-(async () => {
+analyze = async (url, mapping) => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
-  // Navigate to the target page
-  await page.goto('https://example.com', { waitUntil: 'networkidle0' });
+  await page.goto(url, { waitUntil: 'networkidle0' });
 
-  // Inject axe-core script into the page
   await page.evaluate(axeSource);
 
-  // Run axe-core accessibility checks
   const results = await page.evaluate(async () => {
-    return await axe.run();
+    return await axe.run({
+      resultTypes: ['violations', 'incomplete', 'inapplicable']
+    });
   });
 
-  // Output results to console
-  console.log(JSON.stringify(results, null, 2));
-
-  // Optionally save the results to a file
+  // for debug
   fs.writeFileSync(
     path.join(__dirname, 'axe-results.json'),
     JSON.stringify(results, null, 2)
   );
 
+  results['violations'].map((violation) => {
+    console.log(violation.id)
+  })
+
   await browser.close();
-})();
+
+  return results;
+};
+
+analyze('https://nodejs.org/en', {
+  'meta-viewport-large': 2,
+  'link-in-text-block': 3,
+  'color-contrast': 5
+});
