@@ -5,13 +5,13 @@ exports.website = async (req, res) => {
 
     const { url, mapping } = req.body;
     
-    if (!url || !disabilityMapping) {
+    if (!url || !mapping) {
         return res.status(400).json({ error: "URL and disabilityMapping are required" });
     }
 
     try {
         // Analyze the website for accessibility issues
-        const result = service.analyze(url, mapping);
+        const result = await service.analyze(url, mapping);
 
         res.status(200).json(result);
 
