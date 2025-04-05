@@ -14,6 +14,7 @@ import {
   FormControlLabel,
   CssBaseline,
   CircularProgress,
+  Grid
 } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import backgroundImage from './assets/bg.jpg'; // Make sure the background image path is correct
@@ -162,10 +163,10 @@ function AccessibilityDashboard() {
                     Accessibility Score:
                   </Typography>
                   <Box position="relative" display="inline-flex">
-                    <CircularProgress 
-                      variant="determinate" 
-                      value={percentage} 
-                      size={100} 
+                    <CircularProgress
+                      variant="determinate"
+                      value={percentage}
+                      size={100}
                       color="success"  // Custom color for the first progress circle (green)
                     />
                     <Box
@@ -192,10 +193,10 @@ function AccessibilityDashboard() {
                       {key.replace(/-/g, ' ')} Score:
                     </Typography>
                     <Box position="relative" display="inline-flex">
-                      <CircularProgress 
-                        variant="determinate" 
-                        value={value} 
-                        size={100} 
+                      <CircularProgress
+                        variant="determinate"
+                        value={value}
+                        size={100}
                         color="primary" // Default color for other circles (blue)
                       />
                       <Box
@@ -271,21 +272,25 @@ function AccessibilityDashboard() {
                         <strong>Suggestions:</strong>
                         {Object.entries(report.images[violationKey][node.target?.join(', ')]).map(([imageKey, imageData]) => {
                           console.log(imageData)
-                          return <div className="grid grid-cols-2 gap-4 p-4">
-                            <img
-                              src={imageData.original}
-                              alt="original"
-                              className="w-full h-auto rounded-xl shadow-md"
-                            />
-                            <img
-                              src={imageData.modified}
-                              alt="modified"
-                              className="w-full h-auto rounded-xl shadow-md"
-                            />
-                          </div>
+                          return <Box p={2} justifyContent={'center'}>
+                            <Grid container spacing={2}>
+                              <Grid item xs={12} sm={6}>
+                                <img
+                                  src={imageData.original}
+                                  alt="original"
+                                />
+                              </Grid>
+                              <Grid item xs={12} sm={6}>
+                                <img
+                                  src={imageData.modified}
+                                  alt="modified"
+                                />
+                              </Grid>
+                            </Grid>
+                          </Box>
                         })
-                      }
-            </Typography>
+                        }
+                      </Typography>
                       <Typography variant="body2" color="text.secondary">
                         <strong>HTML:</strong> <code>{node.html}</code>
                       </Typography>
