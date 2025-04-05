@@ -28,15 +28,19 @@ exports.analyze = async (url, disability) => {
       resultTypes: ['violations']
     });
   });
-
-  let customCSS = '';
+  
+  let images = {};
 
   let violations = results.violations.filter((v) =>
     disabilityIds.find((disabilityId) => v.id === disabilityId.id) !== undefined);
 
   // Photos without CSS
   for (const violation of violations) {
+    images[violation.id] = {}
+
     for (const node of violation.nodes) {
+      images[violation.id][node.target?.join(', ')] = {}
+
       for (const selector of node.target) {
         try {
           const elementHandle = await page.$(selector);
@@ -44,14 +48,27 @@ exports.analyze = async (url, disability) => {
             const boundingBox = await elementHandle.boundingBox();
             if (boundingBox) {
               // Capture screenshot of the clipped area for this element
+              const viewport = page.viewport();
+              let clipWidth = Math.min(boundingBox.width, viewport.width - boundingBox.x);
+              let clipHeight = Math.min(boundingBox.height, viewport.height - boundingBox.y);
+              // If the computed width/height are not positive, fallback to the element's bounding box dimensions
+              if (clipWidth <= 0 || clipHeight <= 0) {
+                clipWidth = boundingBox.width;
+                clipHeight = boundingBox.height;
+              }
+
               const clip = {
                 x: boundingBox.x,
                 y: boundingBox.y,
-                width: Math.min(boundingBox.width, page.viewport().width - boundingBox.x),
-                height: Math.min(boundingBox.height, page.viewport().height - boundingBox.y)
+                width: clipWidth,
+                height: clipHeight
               };
-              const fileName = `${violation.id}-${selector.replace(/[^a-z0-9]/gi, '_')}-original.png`;
-              await page.screenshot({ path: fileName, clip });
+              const fileName = `${violation.id}-${selector.replace(/[^a-z0-9]/gi, '_')}-original.png`;              
+              images[violation.id][node.target?.join(', ')][node.target] = {
+                "original": "images/" + fileName,
+                "modified": `images/${violation.id}-${selector.replace(/[^a-z0-9]/gi, '_')}-modified.png`
+              }
+              await page.screenshot({ path: "../frontend/public/images/" + fileName, clip });
               console.log(`Captured screenshot for ${selector} as ${fileName}`);
             }
           }
@@ -61,6 +78,7 @@ exports.analyze = async (url, disability) => {
       }
     }
   }
+  await page.screenshot({ path:  path.join(screenshotsDir, "whole-page-original.png")});
 
   // for debug
   // fs.writeFileSync(
@@ -82,14 +100,23 @@ exports.analyze = async (url, disability) => {
             const boundingBox = await elementHandle.boundingBox();
             if (boundingBox) {
               // Capture screenshot of the clipped area for this element
+              const viewport = page.viewport();
+              let clipWidth = Math.min(boundingBox.width, viewport.width - boundingBox.x);
+              let clipHeight = Math.min(boundingBox.height, viewport.height - boundingBox.y);
+              // If the computed width/height are not positive, fallback to the element's bounding box dimensions
+              if (clipWidth <= 0 || clipHeight <= 0) {
+                clipWidth = boundingBox.width;
+                clipHeight = boundingBox.height;
+              }
+
               const clip = {
                 x: boundingBox.x,
                 y: boundingBox.y,
-                width: Math.min(boundingBox.width, page.viewport().width - boundingBox.x),
-                height: Math.min(boundingBox.height, page.viewport().height - boundingBox.y)
+                width: clipWidth,
+                height: clipHeight
               };
               const fileName = `${violation.id}-${selector.replace(/[^a-z0-9]/gi, '_')}-modified.png`;
-              await page.screenshot({ path: fileName, clip });
+              await page.screenshot({ path: "../frontend/public/images/" + fileName, clip });
               console.log(`Captured screenshot for ${selector} as ${fileName}`);
             }
           }
@@ -99,6 +126,7 @@ exports.analyze = async (url, disability) => {
       }
     }
   }
+  await page.screenshot({ path:  path.join(screenshotsDir, "whole-page-modified.png")});
 
   let generalScore = 0;
   let selectedScore = 0;
@@ -127,5 +155,5 @@ exports.analyze = async (url, disability) => {
 
   await browser.close();
 
-  return { percent, percentPerMappings, violationDetails };
+  return { percent, percentPerMappings, violationDetails, images };
 };
