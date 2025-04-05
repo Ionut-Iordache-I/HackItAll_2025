@@ -1,4 +1,4 @@
-exports.applyDisability = async(page, disability) {
+exports.applyDisability = async(page, disability) => {
     if (disability === "blindness") {
         await this.applyBlindness(page);
     } else if (disability === "low_vision") {
