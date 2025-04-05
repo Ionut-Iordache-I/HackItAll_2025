@@ -16,6 +16,7 @@ exports.website = async (req, res) => {
         res.status(200).json(result);
 
       } catch (error) {
+        console.log(error)
         res.status(500).json({ error: "Error processing accessibility disability" });
       }
     

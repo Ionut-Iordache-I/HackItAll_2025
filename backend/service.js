@@ -15,8 +15,11 @@ severityMap = {
 exports.analyze = async (url, disability) => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
+  console.log("aaaaaaaaaaa")
 
-  const ids = mappings[disability]
+  const disabilityIds = mappings[disability]
+  console.log(disabilityIds)
+  console.log("aici")
 
   await page.goto(url, { waitUntil: 'networkidle0' });
 
@@ -40,20 +43,38 @@ exports.analyze = async (url, disability) => {
   let percentPerMappings = {};
   let violationDetails = {};
 
+  console.log(disabilityIds)
+
   // results['passes'].map((pass) => {
   //   generalScore += severityMap[pass.impact];
   // })
-  
-  results['violations'].map((violation) => {
-    if (ids.includes(violation.id)) {
+
+  disabilityIds.map((disabilityId) => {
+    console.log(disabilityId)
+    let violation = results['violations'].find((violation) => violation.id === disabilityId.id);
+    console.log(violation)
+
+    if (violation) {
       selectedScore += severityMap[violation.impact] * violation.nodes.length;
       generalScore += severityMap[violation.impact] * violation.nodes.length;
       percentPerMappings[violation.id] = severityMap[violation.impact] * violation.nodes.length;
       violationDetails[violation.id] = violation;
     } else {
-      generalScore += severityMap[violation.impact] * violation.nodes.length;
+      selectedScore += severityMap[disabilityId.impact];
+      generalScore += severityMap[disabilityId.impact];
     }
   })
+ 
+  // results['violations'].map((violation) => {
+  //   if (ids.includes(violation.id)) {
+  //     selectedScore += severityMap[violation.impact] * violation.nodes.length;
+  //     generalScore += severityMap[violation.impact] * violation.nodes.length;
+  //     percentPerMappings[violation.id] = severityMap[violation.impact] * violation.nodes.length;
+  //     violationDetails[violation.id] = violation;
+  //   } else {
+  //     generalScore += severityMap[violation.impact] * violation.nodes.length;
+  //   }
+  // })
 
   let percent = (selectedScore / generalScore) * 100;
 
