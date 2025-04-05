@@ -126,7 +126,7 @@ exports.analyze = async (url, disability) => {
       }
     }
   }
-  await page.screenshot({ path:  path.join(screenshotsDir, "whole-page-modified.png")});
+  await page.screenshot({ path:  path.join("../frontend/public/images/", "whole-page-modified.png")});
 
   let generalScore = 0;
   let selectedScore = 0;
