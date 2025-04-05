@@ -28,21 +28,19 @@ exports.analyze = async (url, disability) => {
       resultTypes: ['violations']
     });
   });
-
-  // Ensure the screenshots directory exists
-  const screenshotsDir = path.join(__dirname, 'screenshots');
-  if (!fs.existsSync(screenshotsDir)) {
-      fs.mkdirSync(screenshotsDir);
-  }
-
-  let customCSS = '';
+  
+  let images = {};
 
   let violations = results.violations.filter((v) =>
     disabilityIds.find((disabilityId) => v.id === disabilityId.id) !== undefined);
 
   // Photos without CSS
   for (const violation of violations) {
+    images[violation.id] = {}
+
     for (const node of violation.nodes) {
+      images[violation.id][node.target?.join(', ')] = {}
+
       for (const selector of node.target) {
         try {
           const elementHandle = await page.$(selector);
@@ -65,10 +63,13 @@ exports.analyze = async (url, disability) => {
                 width: clipWidth,
                 height: clipHeight
               };
-              const fileName = `${violation.id}-${selector.replace(/[^a-z0-9]/gi, '_')}-original.png`;
-              const filePath = path.join(screenshotsDir, fileName);
-              await page.screenshot({ path: filePath, clip });
-              console.log(`Captured screenshot for ${selector} as ${filePath}`);
+              const fileName = `${violation.id}-${selector.replace(/[^a-z0-9]/gi, '_')}-original.png`;              
+              images[violation.id][node.target?.join(', ')][node.target] = {
+                "original": "images/" + fileName,
+                "modified": `images/${violation.id}-${selector.replace(/[^a-z0-9]/gi, '_')}-modified.png`
+              }
+              await page.screenshot({ path: "../frontend/public/images/" + fileName, clip });
+              console.log(`Captured screenshot for ${selector} as ${fileName}`);
             }
           }
         } catch (error) {
@@ -115,9 +116,8 @@ exports.analyze = async (url, disability) => {
                 height: clipHeight
               };
               const fileName = `${violation.id}-${selector.replace(/[^a-z0-9]/gi, '_')}-modified.png`;
-              const filePath = path.join(screenshotsDir, fileName);
-              await page.screenshot({ path: filePath, clip });
-              console.log(`Captured screenshot for ${selector} as ${filePath}`);
+              await page.screenshot({ path: "../frontend/public/images/" + fileName, clip });
+              console.log(`Captured screenshot for ${selector} as ${fileName}`);
             }
           }
         } catch (error) {
@@ -155,5 +155,5 @@ exports.analyze = async (url, disability) => {
 
   await browser.close();
 
-  return { percent, percentPerMappings, violationDetails };
+  return { percent, percentPerMappings, violationDetails, images };
 };

@@ -225,6 +225,25 @@ function AccessibilityDashboard() {
                         <strong>Target:</strong> {node.target?.join(', ')}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
+                        <strong>Suggestions:</strong>
+                        {Object.entries(report.images[violationKey][node.target?.join(', ')]).map(([imageKey, imageData]) => {
+                          console.log(imageData)
+                          return <div className="grid grid-cols-2 gap-4 p-4">
+                            <img
+                              src={imageData.original}
+                              alt="original"
+                              className="w-full h-auto rounded-xl shadow-md"
+                            />
+                            <img
+                              src={imageData.modified}
+                              alt="modified"
+                              className="w-full h-auto rounded-xl shadow-md"
+                            />
+                          </div>
+                        })
+                      }
+            </Typography>
+                      <Typography variant="body2" color="text.secondary">
                         <strong>HTML:</strong> <code>{node.html}</code>
                       </Typography>
                       <Typography variant="body2" sx={{ mt: 1 }} color="text.secondary">
