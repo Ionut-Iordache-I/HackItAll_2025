@@ -1,9 +1,11 @@
 // app.js
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const port = 8081;
 const routes = require('./routes');
 
+app.use(cors()); // <-- allow all origins by default
 // Middleware to parse JSON request bodies
 app.use(express.json());
 
