@@ -50,7 +50,7 @@ exports.analyze = async (url, mapping) => {
   let percent = (selectedScore / generalScore) * 100;
 
   for (let key of Object.keys(percentPerMappings)) {
-    percentPerMappings[key] = (percentPerMappings[key] / generalScore) * 100;
+    percentPerMappings[key] = (((percentPerMappings[key] / generalScore) * 100) / percent) * 100;
     console.log(percentPerMappings[key]);
   }
 
