@@ -28,6 +28,31 @@ exports.analyze = async (url, disability) => {
       resultTypes: ['violations']
     });
   });
+
+  fs.readdir("../frontend/public/images", (err, files) => {
+    if (err) {
+      console.error('Error reading directory:', err);
+      return;
+    }
+  
+    files.forEach((file) => {
+      const filePath = path.join("../frontend/public/images", file);
+  
+      fs.stat(filePath, (err, stat) => {
+        if (err) {
+          console.error('Error stating file:', err);
+          return;
+        }
+  
+        if (stat.isFile()) {
+          fs.unlink(filePath, (err) => {
+            if (err) console.error('Error deleting file:', err);
+            else console.log(`Deleted: ${filePath}`);
+          });
+        }
+      });
+    });
+  });
   
   let images = {};
 
