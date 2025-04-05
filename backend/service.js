@@ -28,15 +28,19 @@ exports.analyze = async (url, disability) => {
       resultTypes: ['violations']
     });
   });
-
-  let customCSS = '';
+  
+  let images = {};
 
   let violations = results.violations.filter((v) =>
     disabilityIds.find((disabilityId) => v.id === disabilityId.id) !== undefined);
 
   // Photos without CSS
   for (const violation of violations) {
+    images[violation.id] = {}
+
     for (const node of violation.nodes) {
+      images[violation.id][node.target?.join(', ')] = {}
+
       for (const selector of node.target) {
         try {
           const elementHandle = await page.$(selector);
@@ -50,8 +54,12 @@ exports.analyze = async (url, disability) => {
                 width: Math.min(boundingBox.width, page.viewport().width - boundingBox.x),
                 height: Math.min(boundingBox.height, page.viewport().height - boundingBox.y)
               };
-              const fileName = `${violation.id}-${selector.replace(/[^a-z0-9]/gi, '_')}-original.png`;
-              await page.screenshot({ path: fileName, clip });
+              const fileName = `${violation.id}-${selector.replace(/[^a-z0-9]/gi, '_')}-original.png`;              
+              images[violation.id][node.target?.join(', ')][node.target] = {
+                "original": "images/" + fileName,
+                "modified": `images/${violation.id}-${selector.replace(/[^a-z0-9]/gi, '_')}-modified.png`
+              }
+              await page.screenshot({ path: "../frontend/public/images/" + fileName });
               console.log(`Captured screenshot for ${selector} as ${fileName}`);
             }
           }
@@ -89,7 +97,7 @@ exports.analyze = async (url, disability) => {
                 height: Math.min(boundingBox.height, page.viewport().height - boundingBox.y)
               };
               const fileName = `${violation.id}-${selector.replace(/[^a-z0-9]/gi, '_')}-modified.png`;
-              await page.screenshot({ path: fileName, clip });
+              await page.screenshot({ path: "../frontend/public/images/" + fileName });
               console.log(`Captured screenshot for ${selector} as ${fileName}`);
             }
           }
@@ -127,5 +135,5 @@ exports.analyze = async (url, disability) => {
 
   await browser.close();
 
-  return { percent, percentPerMappings, violationDetails };
+  return { percent, percentPerMappings, violationDetails, images };
 };
