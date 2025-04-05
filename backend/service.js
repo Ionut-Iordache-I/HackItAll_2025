@@ -2,6 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 const axeSource = require('axe-core').source;
+const suggestions = require('./suggestions');
 
 const mappings = JSON.parse(fs.readFileSync('./mappings.json', 'utf8'));
 
@@ -14,7 +15,7 @@ severityMap = {
 
 exports.analyze = async (url, disability) => {
   const browser = await puppeteer.launch();
-  const page = await browser.newPage();
+  let page = await browser.newPage();
 
   const disabilityIds = mappings[disability]
 
@@ -28,11 +29,76 @@ exports.analyze = async (url, disability) => {
     });
   });
 
+  let customCSS = '';
+
+  let violations = results.violations.filter((v) =>
+    disabilityIds.find((disabilityId) => v.id === disabilityId.id) !== undefined);
+
+  // Photos without CSS
+  for (const violation of violations) {
+    for (const node of violation.nodes) {
+      for (const selector of node.target) {
+        try {
+          const elementHandle = await page.$(selector);
+          if (elementHandle) {
+            const boundingBox = await elementHandle.boundingBox();
+            if (boundingBox) {
+              // Capture screenshot of the clipped area for this element
+              const clip = {
+                x: boundingBox.x,
+                y: boundingBox.y,
+                width: Math.min(boundingBox.width, page.viewport().width - boundingBox.x),
+                height: Math.min(boundingBox.height, page.viewport().height - boundingBox.y)
+              };
+              const fileName = `${violation.id}-${selector.replace(/[^a-z0-9]/gi, '_')}-original.png`;
+              await page.screenshot({ path: fileName, clip });
+              console.log(`Captured screenshot for ${selector} as ${fileName}`);
+            }
+          }
+        } catch (error) {
+          console.error(`Error capturing screenshot for selector ${selector}:`, error);
+        }
+      }
+    }
+  }
+
   // for debug
-  fs.writeFileSync(
-    path.join(__dirname, 'axe-results.json'),
-    JSON.stringify(results, null, 2)
-  );
+  // fs.writeFileSync(
+  //   path.join(__dirname, 'axe-results.json'),
+  //   JSON.stringify(results, null, 2)
+  // );
+  
+  await suggestions.applyDisability(page, disability)
+
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+  // Photo after CSS apply
+  for (const violation of violations) {
+    for (const node of violation.nodes) {
+      for (const selector of node.target) {
+        try {
+          const elementHandle = await page.$(selector);
+          if (elementHandle) {
+            const boundingBox = await elementHandle.boundingBox();
+            if (boundingBox) {
+              // Capture screenshot of the clipped area for this element
+              const clip = {
+                x: boundingBox.x,
+                y: boundingBox.y,
+                width: Math.min(boundingBox.width, page.viewport().width - boundingBox.x),
+                height: Math.min(boundingBox.height, page.viewport().height - boundingBox.y)
+              };
+              const fileName = `${violation.id}-${selector.replace(/[^a-z0-9]/gi, '_')}-modified.png`;
+              await page.screenshot({ path: fileName, clip });
+              console.log(`Captured screenshot for ${selector} as ${fileName}`);
+            }
+          }
+        } catch (error) {
+          console.error(`Error capturing screenshot for selector ${selector}:`, error);
+        }
+      }
+    }
+  }
 
   let generalScore = 0;
   let selectedScore = 0;
