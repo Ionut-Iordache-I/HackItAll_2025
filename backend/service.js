@@ -3,16 +3,20 @@ const fs = require('fs');
 const path = require('path');
 const axeSource = require('axe-core').source;
 
+const mappings = JSON.parse(fs.readFileSync('./mappings.json', 'utf8'));
+
 severityMap = {
   "minor": 1,
   "moderate": 2,
-  "serious": 4,
-  "critical": 5
+  "serious": 3,
+  "critical": 4
 }
 
-exports.analyze = async (url, ids) => {
+exports.analyze = async (url, disability) => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
+
+  const ids = mappings[disability]
 
   await page.goto(url, { waitUntil: 'networkidle0' });
 
@@ -35,6 +39,10 @@ exports.analyze = async (url, ids) => {
 
   let percentPerMappings = {};
   let violationDetails = {};
+
+  // results['passes'].map((pass) => {
+  //   generalScore += severityMap[pass.impact];
+  // })
   
   results['violations'].map((violation) => {
     if (ids.includes(violation.id)) {
@@ -43,7 +51,7 @@ exports.analyze = async (url, ids) => {
       percentPerMappings[violation.id] = severityMap[violation.impact] * violation.nodes.length;
       violationDetails[violation.id] = violation;
     } else {
-      generalScore += severityMap[violation.impact];
+      generalScore += severityMap[violation.impact] * violation.nodes.length;
     }
   })
 
