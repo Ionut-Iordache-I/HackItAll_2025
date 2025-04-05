@@ -38,11 +38,7 @@ function AccessibilityDashboard() {
     try {
       const response = await axios.post('http://localhost:8081/dev/website', {
         url,
-        ids: [
-          "meta-viewport-large",
-          "link-in-text-block",
-          "color-contrast"
-        ],
+        "disability": "visual"
       });
 
       console.log(response)
