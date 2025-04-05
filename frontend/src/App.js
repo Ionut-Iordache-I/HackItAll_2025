@@ -222,7 +222,7 @@ function AccessibilityDashboard() {
 
           {/* Panel for Accessibility Issues */}
           {report && (
-            <Box
+            <><Box
               sx={{
                 mt: 5,
                 backgroundColor: darkMode ? '#333' : 'white', // Adjust panel background color
@@ -238,7 +238,7 @@ function AccessibilityDashboard() {
               </Typography>
 
               {Object.entries(report.violationDetails).map(([violationKey, violationData]) => (
-                <Box
+                <><Box
                   key={violationKey}
                   sx={{ mb: 3, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}
                 >
@@ -271,25 +271,21 @@ function AccessibilityDashboard() {
                       <Typography variant="body2" color="text.secondary">
                         <strong>Suggestions:</strong>
                         {Object.entries(report.images[violationKey][node.target?.join(', ')]).map(([imageKey, imageData]) => {
-                          console.log(imageData)
                           return <Box p={2} justifyContent={'center'}>
                             <Grid container spacing={2}>
                               <Grid item xs={12} sm={6}>
                                 <img
                                   src={imageData.original}
-                                  alt="original"
-                                />
+                                  alt="original" />
                               </Grid>
                               <Grid item xs={12} sm={6}>
                                 <img
                                   src={imageData.modified}
-                                  alt="modified"
-                                />
+                                  alt="modified" />
                               </Grid>
                             </Grid>
-                          </Box>
-                        })
-                        }
+                          </Box>;
+                        })}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
                         <strong>HTML:</strong> <code>{node.html}</code>
@@ -316,9 +312,41 @@ function AccessibilityDashboard() {
                       )}
                     </Box>
                   ))}
-                </Box>
+                </Box></>
               ))}
-            </Box>
+            </Box><Box
+              justifyContent={'center'}
+              key="whole-images"
+              sx={{
+                mt: 5,
+                backgroundColor: darkMode ? '#333' : 'white', // Adjust panel background color
+                p: 4,
+                borderRadius: 3,
+                boxShadow: 6,
+                maxWidth: '95%',
+                margin: '0 auto 0 auto',
+                "margin-top": '20px'
+              }}
+            >
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Whole page comparasion:</strong>
+                </Typography>
+                <Box p={2} justifyContent={'center'}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <img
+                        src="images/whole-page-original.png"
+                        style={{ width: "400px", height: "250px" }}
+                        alt="original" />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <img
+                        src="images/whole-page-modified.png"
+                        style={{ width: "400px", height: "250px" }}
+                        alt="modified" />
+                    </Grid>
+                  </Grid>
+                </Box></Box></>
           )}
         </Container>
       </Box>
