@@ -180,5 +180,5 @@ exports.analyze = async (url, disability) => {
 
   await browser.close();
 
-  return { percent, percentPerMappings, violationDetails, images };
+  return { percent, percentPerMappings, violationDetails, images, page };
 };
