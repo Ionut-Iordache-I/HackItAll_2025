@@ -115,7 +115,9 @@ function AccessibilityDashboard() {
               }}
             />
             <FormControl sx={{ flex: 1 }}>
-              <InputLabel id="disability-label" sx={{ color: darkMode ? '#ccc' : '#000' }}>Disability Type</InputLabel>
+              <InputLabel id="disability-label" sx={{ color: darkMode ? '#ccc' : '#000' }}>
+                Disability Type
+              </InputLabel>
               <Select
                 labelId="disability-label"
                 value={disabilityType}
@@ -150,28 +152,69 @@ function AccessibilityDashboard() {
             </Button>
           </Box>
 
-          {/* Score visual */}
+          {/* Score visual for Accessibility Score and other individual scores */}
           {percentage !== null && (
-            <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column" mt={3}>
-              <Typography variant="body1" sx={{ mb: 1 }} color="text.primary">
-                Accessibility Score:
-              </Typography>
-              <Box position="relative" display="inline-flex">
-                <CircularProgress variant="determinate" value={percentage} size={100} />
-                <Box
-                  top={0}
-                  left={0}
-                  bottom={0}
-                  right={0}
-                  position="absolute"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <Typography variant="h6" component="div" color="textSecondary">
-                    {`${percentage.toFixed(2)}%`} {/* Limit to 2 decimal places */}
+            <Box display="flex" justifyContent="center" flexDirection="column" mt={3}>
+              {/* Accessibility Score */}
+              <Box display="flex" justifyContent="center" flexWrap="wrap" gap={2} mb={3}>
+                <Box display="flex" flexDirection="column" alignItems="center">
+                  <Typography variant="body1" sx={{ mb: 1 }} color="text.primary">
+                    Accessibility Score:
                   </Typography>
+                  <Box position="relative" display="inline-flex">
+                    <CircularProgress 
+                      variant="determinate" 
+                      value={percentage} 
+                      size={100} 
+                      color="success"  // Custom color for the first progress circle (green)
+                    />
+                    <Box
+                      top={0}
+                      left={0}
+                      bottom={0}
+                      right={0}
+                      position="absolute"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                    >
+                      <Typography variant="h6" component="div" color="textSecondary">
+                        {percentage.toFixed(2)}%
+                      </Typography>
+                    </Box>
+                  </Box>
                 </Box>
+
+                {/* Mapping Scores */}
+                {Object.entries(report.percentPerMappings).map(([key, value], index) => (
+                  <Box key={key} display="flex" flexDirection="column" alignItems="center">
+                    <Typography variant="body1" sx={{ mb: 1 }} color="text.primary">
+                      {key.replace(/-/g, ' ')} Score:
+                    </Typography>
+                    <Box position="relative" display="inline-flex">
+                      <CircularProgress 
+                        variant="determinate" 
+                        value={value} 
+                        size={100} 
+                        color="primary" // Default color for other circles (blue)
+                      />
+                      <Box
+                        top={0}
+                        left={0}
+                        bottom={0}
+                        right={0}
+                        position="absolute"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        <Typography variant="h6" component="div" color="textSecondary">
+                          {value.toFixed(2)}%
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                ))}
               </Box>
             </Box>
           )}
