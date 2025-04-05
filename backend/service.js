@@ -28,11 +28,103 @@ exports.analyze = async (url, disability) => {
     });
   });
 
+  let customCSS = '';
+
+  let violations = results.violations.filter((v) =>
+    disabilityIds.find((disabilityId) => v.id === disabilityId.id) !== undefined);
+
+  // Photos without CSS
+  for (const violation of violations) {
+    for (const node of violation.nodes) {
+      for (const selector of node.target) {
+        try {
+          const elementHandle = await page.$(selector);
+          if (elementHandle) {
+            const boundingBox = await elementHandle.boundingBox();
+            if (boundingBox) {
+              // Capture screenshot of the clipped area for this element
+              const clip = {
+                x: boundingBox.x,
+                y: boundingBox.y,
+                width: Math.min(boundingBox.width, page.viewport().width - boundingBox.x),
+                height: Math.min(boundingBox.height, page.viewport().height - boundingBox.y)
+              };
+              const fileName = `${violation.id}-${selector.replace(/[^a-z0-9]/gi, '_')}-original.png`;
+              await page.screenshot({ path: fileName, clip });
+              console.log(`Captured screenshot for ${selector} as ${fileName}`);
+            }
+          }
+        } catch (error) {
+          console.error(`Error capturing screenshot for selector ${selector}:`, error);
+        }
+      }
+    }
+  }
+
   // for debug
-  fs.writeFileSync(
-    path.join(__dirname, 'axe-results.json'),
-    JSON.stringify(results, null, 2)
-  );
+  // fs.writeFileSync(
+  //   path.join(__dirname, 'axe-results.json'),
+  //   JSON.stringify(results, null, 2)
+  // );
+
+  // violations.forEach(violation => {
+  //   violation.nodes.forEach(node => {
+  //     node.target.forEach(selector => {
+  //       customCSS += `
+  //         ${selector} {
+  //           outline: 3px solid red !important;
+  //         }
+  //         ${selector}::after {
+  //           content: 'Violation: ${violation.id}';
+  //           position: absolute;
+  //           background: yellow;
+  //           color: black;
+  //           font-size: 10px;
+  //           padding: 2px 4px;
+  //           z-index: 10000;
+  //         }
+  //         ${selector} {
+  //           position: relative;
+  //         }
+  //         ${selector} {
+  //           /* Also add a class marker for easier querying later */
+  //         }
+  //       `;
+  //     });
+  //   });
+  // });
+
+  // await page.addStyleTag({ content: customCSS });
+
+  // await new Promise(resolve => setTimeout(resolve, 2000));
+
+  // Photo after CSS apply
+  for (const violation of violations) {
+    for (const node of violation.nodes) {
+      for (const selector of node.target) {
+        try {
+          const elementHandle = await page.$(selector);
+          if (elementHandle) {
+            const boundingBox = await elementHandle.boundingBox();
+            if (boundingBox) {
+              // Capture screenshot of the clipped area for this element
+              const clip = {
+                x: boundingBox.x,
+                y: boundingBox.y,
+                width: Math.min(boundingBox.width, page.viewport().width - boundingBox.x),
+                height: Math.min(boundingBox.height, page.viewport().height - boundingBox.y)
+              };
+              const fileName = `${violation.id}-${selector.replace(/[^a-z0-9]/gi, '_')}-modified.png`;
+              await page.screenshot({ path: fileName, clip });
+              console.log(`Captured screenshot for ${selector} as ${fileName}`);
+            }
+          }
+        } catch (error) {
+          console.error(`Error capturing screenshot for selector ${selector}:`, error);
+        }
+      }
+    }
+  }
 
   let generalScore = 0;
   let selectedScore = 0;
