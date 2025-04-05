@@ -6,7 +6,6 @@ import {
   TextField,
   Button,
   Box,
-  Paper,
   MenuItem,
   Select,
   FormControl,
@@ -29,6 +28,13 @@ function AccessibilityDashboard() {
   const theme = createTheme({
     palette: {
       mode: darkMode ? 'dark' : 'light',
+      background: {
+        default: darkMode ? '#121212' : '#f4f4f4', // Adjust background color for dark mode
+      },
+      text: {
+        primary: darkMode ? '#fff' : '#000', // Adjust text color
+        secondary: darkMode ? '#ccc' : '#555',
+      },
     },
   });
 
@@ -64,7 +70,7 @@ function AccessibilityDashboard() {
         <Container
           maxWidth="lg"
           sx={{
-            backgroundColor: 'white',
+            backgroundColor: darkMode ? '#333' : 'white', // Adjust container background for dark mode
             borderRadius: 2,
             boxShadow: 4,
             padding: 3,
@@ -79,37 +85,43 @@ function AccessibilityDashboard() {
           </Box>
 
           {/* Title centered */}
-          <Typography variant="h4" align="center" gutterBottom>
+          <Typography variant="h4" align="center" gutterBottom color="text.primary">
             Accessibility Dashboard
           </Typography>
 
-          {/* Form for URL + Dropdown on the same line */}
+          {/* Form for URL + Dropdown + Button all on the same line */}
           <Box
             component="form"
             onSubmit={handleSubmit}
             sx={{
               mb: 4,
               display: 'flex',
-              flexDirection: { xs: 'column', sm: 'row' },
+              flexDirection: 'row',
               alignItems: 'center',
               gap: 2,
+              justifyContent: 'center',
             }}
           >
             <TextField
-              fullWidth
               label="Enter URL"
               variant="outlined"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               required
+              sx={{
+                flex: 1,
+                input: { color: darkMode ? '#fff' : '#000' }, // Input text color change
+                label: { color: darkMode ? '#ccc' : '#000' }, // Label color change
+              }}
             />
-            <FormControl fullWidth>
-              <InputLabel id="disability-label">Disability Type</InputLabel>
+            <FormControl sx={{ flex: 1 }}>
+              <InputLabel id="disability-label" sx={{ color: darkMode ? '#ccc' : '#000' }}>Disability Type</InputLabel>
               <Select
                 labelId="disability-label"
                 value={disabilityType}
                 label="Disability Type"
                 onChange={(e) => setDisabilityType(e.target.value)}
+                sx={{ color: darkMode ? '#fff' : '#000' }}
               >
                 <MenuItem value="blindness">Blindness</MenuItem>
                 <MenuItem value="low_vision">Low Vision</MenuItem>
@@ -132,19 +144,17 @@ function AccessibilityDashboard() {
               </Select>
             </FormControl>
 
-            {/* Button inside the form */}
-            <Box display="flex" justifyContent="center" mb={4}>
-              <Button variant="contained" color="primary" type="submit">
-                Check URL
-              </Button>
-            </Box>
+            {/* Check URL Button */}
+            <Button variant="contained" color="primary" type="submit">
+              Check URL
+            </Button>
           </Box>
 
           {/* Score visual */}
           {percentage !== null && (
             <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column" mt={3}>
-              <Typography variant="body1" sx={{ mb: 1 }}>
-                Accessibility Score: {percentage}%
+              <Typography variant="body1" sx={{ mb: 1 }} color="text.primary">
+                Accessibility Score:
               </Typography>
               <Box position="relative" display="inline-flex">
                 <CircularProgress variant="determinate" value={percentage} size={100} />
@@ -159,7 +169,7 @@ function AccessibilityDashboard() {
                   justifyContent="center"
                 >
                   <Typography variant="h6" component="div" color="textSecondary">
-                    {`${percentage}%`}
+                    {`${percentage.toFixed(2)}%`} {/* Limit to 2 decimal places */}
                   </Typography>
                 </Box>
               </Box>
@@ -171,7 +181,7 @@ function AccessibilityDashboard() {
             <Box
               sx={{
                 mt: 5,
-                backgroundColor: 'white',
+                backgroundColor: darkMode ? '#333' : 'white', // Adjust panel background color
                 p: 4,
                 borderRadius: 3,
                 boxShadow: 6,
@@ -179,7 +189,7 @@ function AccessibilityDashboard() {
                 margin: '0 auto',
               }}
             >
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" gutterBottom color="text.primary">
                 Accessibility Issues
               </Typography>
 
@@ -188,13 +198,13 @@ function AccessibilityDashboard() {
                   key={violationKey}
                   sx={{ mb: 3, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}
                 >
-                  <Typography variant="subtitle1" fontWeight="bold">
+                  <Typography variant="subtitle1" fontWeight="bold" color="text.primary">
                     ❌ {violationData.id} ({violationData.impact})
                   </Typography>
-                  <Typography variant="body2" sx={{ mb: 1 }}>{violationData.description}</Typography>
-                  <Typography variant="body2" sx={{ mb: 1 }}>
+                  <Typography variant="body2" sx={{ mb: 1 }} color="text.primary">{violationData.description}</Typography>
+                  <Typography variant="body2" sx={{ mb: 1 }} color="text.primary">
                     <strong>More Info:</strong>{' '}
-                    <a href={violationData.helpUrl} target="_blank" rel="noopener noreferrer">
+                    <a href={violationData.helpUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>
                       {violationData.help}
                     </a>
                   </Typography>
@@ -205,7 +215,7 @@ function AccessibilityDashboard() {
                       sx={{
                         mt: 2,
                         p: 1,
-                        backgroundColor: '#f9f9f9',
+                        backgroundColor: darkMode ? '#444' : '#f9f9f9', // Adjust background color for nodes
                         borderRadius: 1,
                         border: '1px solid',
                         borderColor: 'divider',
@@ -217,14 +227,14 @@ function AccessibilityDashboard() {
                       <Typography variant="body2" color="text.secondary">
                         <strong>HTML:</strong> <code>{node.html}</code>
                       </Typography>
-                      <Typography variant="body2" sx={{ mt: 1 }}>
+                      <Typography variant="body2" sx={{ mt: 1 }} color="text.secondary">
                         <strong>Failure Summary:</strong><br />
                         {node.failureSummary}
                       </Typography>
 
                       {node.any?.[0]?.data?.contrastRatio && (
                         <Box sx={{ mt: 1, fontSize: '0.875rem' }}>
-                          <Typography variant="body2" sx={{ mb: 1 }}>
+                          <Typography variant="body2" sx={{ mb: 1 }} color="text.secondary">
                             <strong>Contrast Details:</strong>
                           </Typography>
                           <ul>
