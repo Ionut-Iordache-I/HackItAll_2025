@@ -53,6 +53,26 @@ function AccessibilityDashboard() {
     }
   };
 
+  const openModifiedPage = async (htmlContent) => {
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+  
+    // Optionally, revoke the URL after some time:
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 10000);
+  };
+  
+  const handleOpenPage = async () => {
+    if (report && report.page) {
+      openModifiedPage(report.page);
+    } else {
+      alert('Report not ready yet.');
+    }
+  };
+
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -346,11 +366,11 @@ function AccessibilityDashboard() {
                         alt="modified" />
                     </Grid>
                   </Grid>
-                </Box></Box></>
-    //           <div
-    //   style={{ width: '100%', minHeight: '600px', border: '1px solid #ccc' }}
-    //   dangerouslySetInnerHTML={{ __html: report.page }}
-    // /></>
+                </Box></Box>
+                {/* <div>
+                  <button onClick={handleOpenPage}>Open Modified Page</button>
+                </div> */}
+                </>
           )}
         </Container>
       </Box>
