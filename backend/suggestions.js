@@ -43,23 +43,23 @@ exports.applyDisability = async(page, disability) => {
 exports.applyBlindness = async(page) => {
     await page.addStyleTag({
         content: `
-        * {
+          * {
             color: transparent !important;
             background-color: black !important;
-        }
-        img, svg, video {
+          }
+          img, svg, video {
             display: none !important;
-        }
-        `
+          }
+        `,
     });
 };
 
 exports.applyLowVision = async(page) => {
     await page.addStyleTag({
         content: `
-          *:not(script):not(style) {
-            filter: blur(2px);
-          }
+            body {
+                filter: blur(3px) contrast(0.9) brightness(1.2);
+            }
         `
     });
 };
@@ -130,44 +130,32 @@ exports.applyNightBlindness = async(page) => {
 
 exports.applyDyslexia = async (page) => {
     await page.addStyleTag({
-      content: `
-        * {
-          font-family: "Comic Sans MS", "Arial", sans-serif !important;
-          line-height: 1.6 !important;
-          letter-spacing: 0.05em !important;
-        }
-  
-        p, h1, h2, h3, h4, li {
-          transform: rotate(-2deg);
-          margin-bottom: 1em;
-        }
-  
-        /* Highlight important text for better readability */
-        strong, b {
-          color: #c0392b !important;
-        }
-  
-        /* Modify links to make them more readable */
-        a {
-          text-decoration: underline;
-          color: #2980b9;
-        }
-      `
+        content: `
+            * {
+                font-family: "OpenDyslexic", "Comic Sans MS", "Arial", sans-serif !important;
+                letter-spacing: 0.12em !important;
+                line-height: 1.8 !important;
+            }
+            p, h1, h2, h3 {
+                background: #fefbc8;
+                padding: 0.5em;
+                border-radius: 6px;
+            }
+        `
     });
 };
 
 exports.applyADHD = async(page) => {
     await page.addStyleTag({
         content: `
-          *:focus {
-            outline: 4px dashed #FF00FF !important;
-            animation: pulse 1s infinite alternate;
-          }
-    
-          @keyframes pulse {
-            0% { opacity: 0.7; }
-            100% { opacity: 1; }
-          }
+            *:focus {
+                outline: 4px dashed #FF00FF !important;
+                animation: pulse 1s infinite alternate;
+            }
+            @keyframes pulse {
+                0% { opacity: 0.8; }
+                100% { opacity: 1; }
+            }
         `
     });
 };
