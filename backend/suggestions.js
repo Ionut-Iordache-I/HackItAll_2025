@@ -57,10 +57,8 @@ exports.applyBlindness = async(page) => {
 exports.applyLowVision = async(page) => {
     await page.addStyleTag({
         content: `
-          body {
-            zoom: 1.5;
-            font-size: 150% !important;
-            line-height: 1.8 !important;
+          *:not(script):not(style) {
+            filter: blur(2px);
           }
         `
     });
