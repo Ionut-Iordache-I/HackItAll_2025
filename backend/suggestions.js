@@ -48,9 +48,9 @@ exports.applyBlindness = async(page) => {
             background-color: black !important;
           }
           img, svg, video {
-            display: none !important;
+            visibility: hidden !important;
           }
-        `,
+        `
     });
 };
 
@@ -95,20 +95,58 @@ exports.applyRedColorBlindness = async(page) => {
 };
 
 exports.applyGreenColorBlindness = async(page) => {
-    await page.addStyleTag({
+    await page.evaluate(() => {
+        const svgNS = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(svgNS, "svg");
+        svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        svg.setAttribute("style", "position:absolute;width:0;height:0");
+    
+        svg.innerHTML = `
+          <filter id="deuteranopia">
+            <feColorMatrix type="matrix"
+              values="0.625, 0.375, 0, 0, 0
+                      0.7,   0.3,   0, 0, 0
+                      0,     0.3,   0.7, 0, 0
+                      0,     0,     0, 1, 0"/>
+          </filter>
+        `;
+    
+        document.body.appendChild(svg);
+      });
+    
+      await page.addStyleTag({
         content: `
           html {
-            filter: grayscale(0.8) brightness(1.2);
+            filter: url(#deuteranopia) !important;
           }
         `
     });
 };
 
 exports.applyBlueColorBlindness = async(page) => {
-    await page.addStyleTag({
+    await page.evaluate(() => {
+        const svgNS = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(svgNS, "svg");
+        svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        svg.setAttribute("style", "position:absolute;width:0;height:0");
+    
+        svg.innerHTML = `
+      <filter id="tritanopia">
+        <feColorMatrix type="matrix"
+          values="0.95  0.05   0     0  0
+                  0     0.433  0.567 0  0
+                  0     0.475  0.525 0  0
+                  0     0      0     1  0"/>
+      </filter>
+    `;
+    
+        document.body.appendChild(svg);
+      });
+    
+      await page.addStyleTag({
         content: `
           html {
-            filter: sepia(1) hue-rotate(90deg);
+            filter: url(#tritanopia) !important;
           }
         `
     });
@@ -117,14 +155,33 @@ exports.applyBlueColorBlindness = async(page) => {
 exports.applyNightBlindness = async(page) => {
     await page.addStyleTag({
         content: `
-          body {
-            background-color: black !important;
-            color: #ccc !important;
-          }
-          * {
-            filter: brightness(0.5);
-          }
-        `
+        /* Dim the whole page to simulate poor low-light vision */
+        html {
+          filter: brightness(0.2) contrast(0.7) blur(1px);
+        }
+  
+        /* Reduce saturation to make colors harder to distinguish */
+        * {
+          filter: grayscale(0.4) brightness(0.6) !important;
+          color: #999 !important;
+          background-color: #111 !important;
+        }
+  
+        /* Add a vignette effect to simulate poor peripheral vision */
+        body::after {
+          content: '';
+          position: fixed;
+          top: 0; left: 0; width: 100vw; height: 100vh;
+          pointer-events: none;
+          background: radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(0,0,0,0.8) 100%);
+          z-index: 9999;
+        }
+  
+        /* Optional: simulate a little text smearing */
+        body, p, span, a, h1, h2, h3, h4, h5 {
+          text-shadow: 0 0 2px rgba(255,255,255,0.2);
+        }
+      `
     });
 };
 
