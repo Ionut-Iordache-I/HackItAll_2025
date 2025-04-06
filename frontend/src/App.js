@@ -25,6 +25,7 @@ function AccessibilityDashboard() {
   const [disabilityType, setDisabilityType] = useState('visual');
   const [darkMode, setDarkMode] = useState(false);
   const [percentage, setPercentage] = useState(null);
+  const forceUpdate = React.useReducer(() => ({}))[1]
 
   const theme = createTheme({
     palette: {
@@ -48,6 +49,7 @@ function AccessibilityDashboard() {
       });
       setReport(response.data);
       setPercentage(response.data.percent);
+      forceUpdate();
     } catch (error) {
       console.error('Error fetching accessibility report', error);
     }
@@ -132,7 +134,6 @@ function AccessibilityDashboard() {
                 <MenuItem value="green_color_blindness">Green Color Blindness</MenuItem>
                 <MenuItem value="blue_color_blindness">Blue Color Blindness</MenuItem>
                 <MenuItem value="night_blindness">Night Blindness</MenuItem>
-                <MenuItem value="dyslexia">Dyslexia</MenuItem>
                 <MenuItem value="adhd">ADHD</MenuItem>
                 <MenuItem value="autism">Autism</MenuItem>
                 <MenuItem value="memory_impairments">Memory Impairments</MenuItem>
@@ -269,7 +270,11 @@ function AccessibilityDashboard() {
                         <strong>Target:</strong> {node.target?.join(', ')}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        <strong>Suggestions:</strong>
+                        <strong>Comparasion between original element and how it would look for people with the disability:</strong>
+                        <Box sx={{
+                          justifyContent: "center",
+                          display: "flex"
+                        }}>
                         {Object.entries(report.images[violationKey][node.target?.join(', ')]).map(([imageKey, imageData]) => {
                           return <Box p={2} justifyContent={'center'}>
                             <Grid container spacing={2}>
@@ -286,6 +291,7 @@ function AccessibilityDashboard() {
                             </Grid>
                           </Box>;
                         })}
+                        </Box>
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
                         <strong>HTML:</strong> <code>{node.html}</code>
@@ -331,18 +337,20 @@ function AccessibilityDashboard() {
                 <Typography variant="body2" color="text.secondary">
                   <strong>Whole page comparasion:</strong>
                 </Typography>
-                <Box p={2} justifyContent={'center'}>
+                <Box p={2} justifyContent={'center'} sx={{
+                  display: "flex"
+                }}>
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
                       <img
                         src="images/whole-page-original.png"
-                        style={{ width: "400px", height: "250px" }}
+                        style={{ width: "400px", height: "280px" }}
                         alt="original" />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <img
                         src="images/whole-page-modified.png"
-                        style={{ width: "400px", height: "250px" }}
+                        style={{ width: "400px", height: "280px" }}
                         alt="modified" />
                     </Grid>
                   </Grid>
