@@ -299,13 +299,14 @@ function AccessibilityDashboard() {
                           return <Box p={2} justifyContent={'center'}>
                             <Grid container spacing={2}>
                               <Grid item xs={12} sm={6}>
+                                {/* add date in order to enforce a rerender if the link remains the same, but image is regenerated */}
                                 <img
-                                  src={imageData.original}
+                                  src={imageData.original + `?${Date.now()}`}
                                   alt="original" />
                               </Grid>
                               <Grid item xs={12} sm={6}>
                                 <img
-                                  src={imageData.modified}
+                                  src={imageData.modified + `?${Date.now()}`}
                                   alt="modified" />
                               </Grid>
                             </Grid>
@@ -363,13 +364,13 @@ function AccessibilityDashboard() {
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
                       <img
-                        src="images/whole-page-original.png"
+                        src={"images/whole-page-original.png" + `?${Date.now()}`}
                         style={{ width: "400px", height: "280px" }}
                         alt="original" />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <img
-                        src="images/whole-page-modified.png"
+                        src={"images/whole-page-modified.png" + `?${Date.now()}`}
                         style={{ width: "400px", height: "280px" }}
                         alt="modified" />
                     </Grid>

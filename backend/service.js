@@ -29,6 +29,14 @@ exports.analyze = async (url, disability) => {
     });
   });
 
+  // create images dir if it doesn't exist
+  if (!fs.existsSync("../frontend/public/images")) {
+    fs.mkdirSync("../frontend/public/images", { recursive: true });
+    console.log(`Directory created: ../frontend/public/images`);
+  } else {
+    console.log(`Directory already exists: ../frontend/public/images`);
+  }
+
   fs.readdir("../frontend/public/images", (err, files) => {
     if (err) {
       console.error('Error reading directory:', err);
