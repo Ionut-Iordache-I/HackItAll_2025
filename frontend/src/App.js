@@ -55,24 +55,24 @@ function AccessibilityDashboard() {
     }
   };
 
-  const openModifiedPage = async (htmlContent) => {
-    const blob = new Blob([htmlContent], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    window.open(url, '_blank');
+  // const openModifiedPage = async (htmlContent) => {
+  //   const blob = new Blob([htmlContent], { type: 'text/html' });
+  //   const url = URL.createObjectURL(blob);
+  //   window.open(url, '_blank');
   
-    // Optionally, revoke the URL after some time:
-    setTimeout(() => {
-      URL.revokeObjectURL(url);
-    }, 10000);
-  };
+  //   // Optionally, revoke the URL after some time:
+  //   setTimeout(() => {
+  //     URL.revokeObjectURL(url);
+  //   }, 10000);
+  // };
   
-  const handleOpenPage = async () => {
-    if (report && report.page) {
-      openModifiedPage(report.page);
-    } else {
-      alert('Report not ready yet.');
-    }
-  };
+  // const handleOpenPage = async () => {
+  //   if (report && report.page) {
+  //     openModifiedPage(report.page);
+  //   } else {
+  //     alert('Report not ready yet.');
+  //   }
+  // };
 
 
   return (
@@ -376,8 +376,12 @@ function AccessibilityDashboard() {
                     </Grid>
                   </Grid>
                 </Box></Box>
-                {/* <div>
-                  <button onClick={handleOpenPage}>Open Modified Page</button>
+                {/* <div sx={{ height: '100vh' }}>
+                  <iframe
+                    srcDoc={report.page.htmlContent} // Ensure report.page is a valid HTML string
+                    title="Disability Simulated Page"
+                    style={{ width: '100%', height: '100%', border: 'none' }}
+                  />
                 </div> */}
                 </>
           )}
