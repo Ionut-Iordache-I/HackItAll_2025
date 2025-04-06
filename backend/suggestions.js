@@ -74,10 +74,10 @@ exports.applyRedColorBlindness = async(page) => {
         svg.innerHTML = `
           <filter id="protanopia">
             <feColorMatrix type="matrix"
-              values="0.567, 0.433, 0, 0, 0
-                      0.558, 0.442, 0, 0, 0
-                      0,     0.242, 0.758, 0, 0
-                      0,     0,     0,     1, 0"/>
+            values="0.4, 0.6, 0, 0, 0
+                    0.3, 0.7, 0, 0, 0
+                    0,   0.2, 0.8, 0, 0
+                    0,   0,   0,   1, 0"/>
           </filter>
         `;
     
